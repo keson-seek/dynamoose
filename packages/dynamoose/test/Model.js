@@ -757,13 +757,17 @@ describe("Model", () => {
 					}});
 					new dynamoose.Table("User", [User]);
 					const date = new Date();
-					getItemFunction = () => Promise.resolve({"Item": {"id": {"N": "1"}, "name": {"S": "Charlie"}, "birthday": {"S": date.toISOString()}}});
+					const isoString = date.toISOString();
+					getItemFunction = () => Promise.resolve({"Item": {"id": {"N": "1"}, "name": {"S": "Charlie"}, "birthday": {"S": isoString}}});
 					const user = await callType.func(User).bind(User)(1);
 					expect(user).toBeInstanceOf(Object);
 					expect(Object.keys(user)).toEqual(["id", "name", "birthday"]);
 					expect(user.id).toEqual(1);
 					expect(user.name).toEqual("Charlie");
-					expect(user.birthday).toEqual(date);
+					// When storage is iso, fromDynamo returns string, not Date object
+					expect(user.birthday).toEqual(isoString);
+					expect(typeof user.birthday).toEqual("string");
+					expect(user.birthday).not.toBeInstanceOf(Date);
 				});
 
 				it("Should throw error if returning Number for ISO Date", async () => {

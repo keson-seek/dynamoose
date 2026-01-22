@@ -1142,6 +1142,19 @@ describe("Schema", () => {
 			expect(functions.fromDynamo(1582246653)).toEqual(new Date(1582246653000));
 		});
 
+		it("Should have correct custom type for date with custom storage settings as iso", () => {
+			const functions = new dynamoose.Schema({"id": {"type": {"value": Date, "settings": {"storage": "iso"}}}}).getAttributeTypeDetails("id").customType.functions;
+			expect(functions.toDynamo).toBeDefined();
+			expect(functions.fromDynamo).toBeDefined();
+			const testDate = new Date(1582246653000);
+			const isoString = testDate.toISOString();
+			expect(functions.toDynamo(testDate)).toEqual(isoString);
+			// fromDynamo should return string, not Date object when storage is iso
+			expect(functions.fromDynamo(isoString)).toEqual(isoString);
+			expect(typeof functions.fromDynamo(isoString)).toEqual("string");
+			expect(functions.fromDynamo(isoString)).not.toBeInstanceOf(Date);
+		});
+
 		it("Should have correct result for multiple types", () => {
 			const result = new dynamoose.Schema({"id": {"type": [String, Buffer]}}).getAttributeTypeDetails("id");
 			expect(result.map((item) => ({"name": item.name, "dynamodbType": item.dynamodbType}))).toEqual([{"name": "String", "dynamodbType": "S"}, {"name": "Buffer", "dynamodbType": "B"}]);

@@ -183,7 +183,7 @@ const attributeTypesMain: DynamoDBType[] = ((): DynamoDBType[] => {
 				return numberType;
 			}
 		}, "customType": {
-			"functions": (typeSettings: AttributeDefinitionTypeSettings): {toDynamo: (val: Date) => number | string; fromDynamo: (val: number | string) => Date; isOfType: (val: Date, type: "toDynamo" | "fromDynamo") => boolean} => ({
+			"functions": (typeSettings: AttributeDefinitionTypeSettings): {toDynamo: (val: Date) => number | string; fromDynamo: (val: number | string) => Date | string; isOfType: (val: Date | string | number, type: "toDynamo" | "fromDynamo") => boolean} => ({
 				"toDynamo": (val: Date): number | string => {
 					if (typeSettings.storage === "seconds") {
 						return Math.round(val.getTime() / 1000);
@@ -193,16 +193,17 @@ const attributeTypesMain: DynamoDBType[] = ((): DynamoDBType[] => {
 						return val.getTime();
 					}
 				},
-				"fromDynamo": (val: number | string): Date => {
+				"fromDynamo": (val: number | string): Date | string => {
 					if (typeSettings.storage === "seconds") {
 						return new Date((val as number) * 1000);
 					} else if (typeSettings.storage === "iso") {
-						return new Date(val);
+						// Return string as-is when storage is iso
+						return val as string;
 					} else {
 						return new Date(val);
 					}
 				},
-				"isOfType": (val: Date, type: "toDynamo" | "fromDynamo"): boolean => {
+				"isOfType": (val: Date | string | number, type: "toDynamo" | "fromDynamo"): boolean => {
 					if (type === "toDynamo") {
 						return val instanceof Date;
 					} else {

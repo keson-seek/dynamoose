@@ -2,6 +2,17 @@
 
 ---
 
+## Version 4.1.5-fork
+
+This release fixes ISO Date storage to return strings instead of Date objects.
+
+### General
+
+- Fixed `fromDynamo` to return strings instead of Date objects when `storage: 'iso'` is set for Date types. This ensures consistency when reading ISO-formatted dates from DynamoDB.
+
+
+---
+
 ## Version 4.1.5
 
 This release adds DynamoDB Streams support through Table options.
