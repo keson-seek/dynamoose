@@ -4,7 +4,7 @@ node_modules/
 .nyc_output
 coverage
 coverage.html
-dist
+# dist # to allow for github installation of the package
 docs/docs
 
 docs/package-lock.json
